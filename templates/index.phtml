@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+ 
+<!-- jQuery UI -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+ 
+<!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container" >
+    <div class="row">
+    <label>Tag Search:</label>
+    </div>
+  <div class="row" >
+     
+        <input type="text" name="tag" id="search_tag" class="form-control">  
+  </div>
+  <div class="row">
+        <button id="search_problem">Submit</button>
+       
+    </div>
+    <br><br> 
+      
+    <table align = "center"
+            id="table" border="1"> 
+    </table> 
+</div>
+
+
+<script type="text/javascript">
+
+    $( "#search_tag" ).autocomplete({source: '/tags/search'});
+ 
+    $("#search_problem").click(function(){
+        $.get( "/problem/search",{term: $("#search_tag").val() }, function( data ) {
+            $("#table tr").remove();
+            list = data;
+            constructTable("#table");
+            function constructTable(selector) { 
+              
+              // Getting the all column names 
+              var cols = Headers(list, selector);   
+     
+              // Traversing the JSON data 
+              for (var i = 0; i < list.length; i++) { 
+                  var row = $('<tr/>');    
+                  for (var colIndex = 0; colIndex < cols.length; colIndex++) 
+                  { 
+                      var val = list[i][cols[colIndex]];
+                      var str1 =  cols[colIndex];
+                      var str2  = "problemcode"
+                        if(str1.localeCompare(str2)==0){
+                            var dm = "<a href = https://www.codechef.com/problems/" + val + " target='_blank' > " + val + " </a>" 
+                        // If there is any key, which is matching 
+                        // with the column name 
+                        if (val == null) val = "";   
+                            row.append($('<td/>').html(dm)); 
+                        }
+                        else{
+                            if (val == null) val = "";   
+                            row.append($('<td/>').html(val));
+                        }
+                      
+                  } 
+                    
+                  // Adding each row to the table 
+                  $(selector).append(row); 
+              } 
+          } 
+            
+          function Headers(list, selector) { 
+              var columns = []; 
+              var header = $('<tr/>'); 
+                
+              for (var i = 0; i < list.length; i++) { 
+                  var row = list[i]; 
+                    
+                  for (var k in row) { 
+                      if ($.inArray(k, columns) == -1) { 
+                          columns.push(k); 
+                            
+                          // Creating the header 
+                          header.append($('<th/>').html(k)); 
+                      } 
+                  } 
+              } 
+                
+              // Appending the header to the table 
+              $(selector).append(header); 
+                  return columns; 
+          }        
+        });
+    });
+
+    
+         
+
+</script>
+
+</body>
+</html>
