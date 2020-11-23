@@ -10,27 +10,62 @@
  
 <!-- Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font: 16px Arial;  
+}
+
+/*the container must be positioned relative:*/
+.autocomplete {
+  
+  position: relative;
+  display: inline-block;
+}
+
+input {
+  border: 1px solid transparent;
+  background-color: #f1f1f1;
+  padding: 10px;
+  font-size: 16px;
+}
+
+input[type=text] {
+  background-color: #f1f1f1;
+  width: 100%;
+}
+
+input[type=submit] {
+  background-color: DodgerBlue;
+  color: #fff;
+  cursor: pointer;
+}
+
+
+</style>
+
 </head>
 
 <body>
-<div class="container" >
-    <div class="row">
-    <label>Tag Search:</label>
-    </div>
-  <div class="row" >
-     
-        <input type="text" name="tag" id="search_tag" class="form-control">  
+
+
+<p>Tag Search:</p>
+
+<!--Make sure the form has the autocomplete function switched off:-->
+  <div class="autocomplete" style="width:300px;"  >
+    <input id = "search_tag" type="text" >
   </div>
-  <div class="row">
-        <button id="search_problem">Submit</button>
-       
-    </div>
-    <br><br> 
-      
-    <table align = "center"
+  <input type="submit" id = "search_problem">
+
+  <table align = "center"
             id="table" border="1"> 
     </table> 
-</div>
+
 
 
 <script type="text/javascript">
