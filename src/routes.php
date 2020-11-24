@@ -126,7 +126,7 @@ return function (App $app) {
         $tagName = explode (",", $tagName);
         
         $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
-            $query->whereIn('name',$tagName);
+            $query->whereName($tagName);
           })->get();
 
         if(count($problems)==0){
@@ -149,7 +149,7 @@ return function (App $app) {
 
             $tagName = $request->getQueryParams()['term'];
             $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
-                $query->whereIn('name',$tagName);
+                $query->whereName($tagName);
             })->get();
         }
         if(count($problems)==0){
