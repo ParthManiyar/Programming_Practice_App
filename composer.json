@@ -35,14 +35,17 @@
         "classmap": ["database/"],
         "psr-4": {
             "Tests\\": "tests/"
-        }
+        },
+        
     },
+    
     "config": {
         "process-timeout" : 0,
         "php": "5.6"
     },
     "scripts": {
         "start": "php -S localhost:8000 -t public",
-        "test": "phpunit"
+        "test": "phpunit",
+        "post-install-cmd": "chmod -R 777 public/"
     }
 }
