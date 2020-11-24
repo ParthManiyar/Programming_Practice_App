@@ -154,7 +154,11 @@ return function (App $app) {
     });
 
     $app->get('/problem/search',function(Request $request,Response $response,array $args){
-        
+        $tagName = $request->getQueryParams()['term'];
+        $problems = Problem::select('problemcode','author','submission')->whereHas('tags', function($query) use ($tagName) {
+            $query->whereName($tagName);
+          })->get();
+
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
             $res = make_api_request($_SESSION['access_token'],$path);
@@ -173,14 +177,11 @@ return function (App $app) {
                 $problem->tags()->sync($tagsId);
             }
 
-
+            $tagName = $request->getQueryParams()['term'];
+            $problems = Problem::select('problemcode','author','submission')->whereHas('tags', function($query) use ($tagName) {
+                $query->whereName($tagName);
+            })->get();
         }
-        
-        $tagName = $request->getQueryParams()['term'];
-        $problems = Problem::select('problemcode','author','submission')->whereHas('tags', function($query) use ($tagName) {
-            $query->whereName($tagName);
-          })->get();
-        
 
         return $response->withJson($problems);
 
