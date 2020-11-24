@@ -108,7 +108,7 @@ return function (App $app) {
             //header('Location: http://localhost:8000/problems/create');
             //die();          
         } else{
-            take_user_to_codechef_permissions_page($GLOBALS['config']);
+            take_user_to_codechef_permissions_page($config);
         }
         
         return $response;
