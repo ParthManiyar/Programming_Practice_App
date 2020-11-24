@@ -121,7 +121,7 @@ return function (App $app) {
         $tag=$request->getQueryParams()['tag'];
         $path = "https://api.codechef.com/tags/problems?filter=$tag&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
         $res = make_api_request($_SESSION['access_token'],$path);
-        echo $res;
+        echo count($res);
         $res = json_decode($res,true);
         foreach($res['result']['data']['content'] as $key=>$data){
             $problem = new Problem();
