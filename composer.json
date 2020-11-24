@@ -35,8 +35,7 @@
         "classmap": ["database/"],
         "psr-4": {
             "Tests\\": "tests/"
-        },
-        
+        }
     },
     
     "config": {
