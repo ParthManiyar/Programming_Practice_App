@@ -3,6 +3,23 @@
 use Illuminate\Database\Schema\Blueprint;
 use Phinx\Migration\AbstractMigration;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+
+class BaseMigration extends AbstractMigration
+{
+    
+    /**
+     * @var \Illuminate\Database\Schema\MySqlBuilder
+     */
+    protected $schema;
+    
+    protected function init()
+    {
+        $this->schema = (new Capsule)->schema();
+    }
+    
+}
+
 class CreateProblemTable extends BaseMigration
 {
 
