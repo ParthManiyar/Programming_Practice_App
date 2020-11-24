@@ -65,6 +65,11 @@ input[type=submit] {
   <table align = "center"
             id="table" border="1"> 
     </table> 
+    <strong> 
+      <span id = "result">
+
+      </span> 
+    </strong>
 
 
 
@@ -74,9 +79,14 @@ input[type=submit] {
  
     $("#search_problem").click(function(){
         $.get( "/problem/search",{term: $("#search_tag").val() }, function( data ) {
+          if ( data.length == 0 ) {
+            $('#result').replaceWith('<span id = "result">'+ "Please enter the valid tag" + '</span>');
+          }
+          else{
             $("#table tr").remove();
             list = data;
             constructTable("#table");
+          }
             function constructTable(selector) { 
               
               // Getting the all column names 
@@ -129,7 +139,8 @@ input[type=submit] {
               // Appending the header to the table 
               $(selector).append(header); 
                   return columns; 
-          }        
+          }
+        
         });
     });
 
