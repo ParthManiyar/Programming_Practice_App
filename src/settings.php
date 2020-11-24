@@ -43,7 +43,7 @@ return [
 
         // Database settings
         'database'               => [
-            'driver'    => 'mysqli',
+            'driver'    => 'mysql',
             'host'      => $cleardb_server,
             'database'  => $cleardb_db,
             'username'  => $cleardb_username,
