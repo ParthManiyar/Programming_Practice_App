@@ -47,8 +47,8 @@ function generate_access_token_from_refresh_token($config, $oauth_details){
 function make_curl_request($url, $post = FALSE,$headers = array()) 
 {
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     
     if ($post) {
@@ -87,8 +87,8 @@ return function (App $app) {
             'api_endpoint'=> 'https://api.codechef.com/',
             'authorization_code_endpoint'=> 'https://api.codechef.com/oauth/authorize',
             'access_token_endpoint'=> 'https://api.codechef.com/oauth/token',
-            'redirect_uri'=> 'http://localhost:8000/tags/auth',
-            'website_base_url' => 'http://localhost:8000/tags/auth'
+            'redirect_uri'=> 'https://programming-pratice-app.herokuapp.com/tags/auth',
+            'website_base_url' => 'https://programming-pratice-app.herokuapp.com/tags/auth'
         );
         
         
