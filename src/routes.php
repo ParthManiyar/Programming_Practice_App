@@ -47,8 +47,7 @@ function generate_access_token_from_refresh_token($config, $oauth_details){
 function make_curl_request($url, $post = FALSE,$headers = array()) 
 {
     $ch = curl_init($url);
-    //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     
     if ($post) {
@@ -75,49 +74,21 @@ function make_api_request($oauth_config, $path){
 return function (App $app) {
     $container = $app->getContainer();
 
-    $app->get('/tags/auth',function(Request $request,Response $response,array $args){
-
-        $oauth_details = array('authorization_code' => '',
-            'access_token' => '',
-            'refresh_token' => ''
-        );
-        
-        $config = array('client_id'=> '21c0c6bf43fe831fa88386abf22155b5',
-            'client_secret' => '9a41e4fdf2b23c854783062891b38734',
-            'api_endpoint'=> 'https://api.codechef.com/',
-            'authorization_code_endpoint'=> 'https://api.codechef.com/oauth/authorize',
-            'access_token_endpoint'=> 'https://api.codechef.com/oauth/token',
-            'redirect_uri'=> 'https://programming-pratice-app.herokuapp.com/tags/auth',
-            'website_base_url' => 'https://programming-pratice-app.herokuapp.com/tags/auth'
-        );
-        
-        
-        if(isset($_GET['code'])){
-           $oauth_details['authorization_code'] = $_GET['code'];
-            $oauth = generate_access_token_first_time($config,$oauth_details);  
-            $_SESSION['access_token'] = $oauth['access_token'];
-            $_SESSION['refresh_token']=$oauth['refresh_token'];
-            $path = "https://api.codechef.com/tags/problems?filter=&fields=&limit=100&offset=0";
-            $res = make_api_request($_SESSION['access_token'],$path);
-            $res = json_decode($res,true);
-            foreach($res['result']['data']['content'] as $key=>$data){
-                $tag = new Tag();
-                $tag->name = $key;
-                $tag->save();
-            }
-            //header('Location: http://localhost:8000/problems/create');
-            //die();          
-        } else{
-            take_user_to_codechef_permissions_page($config);
+    $app->get('/tags/create',function(Request $request,Response $response,array $args){
+        $path = "https://api.codechef.com/tags/problems?filter=&fields=&limit=100&offset=0";
+        $res = make_api_request($_SESSION['access_token'],$path);
+        $res = json_decode($res,true);
+        foreach($res['result']['data']['content'] as $key=>$data){
+            $tag = new Tag();
+            $tag->name = $key;
+            $tag->save();
         }
-        
         return $response;
     });
         
 
     $app->get('/problems/create',function(Request $request,Response $response,array $args){
 
-        //$tag = Tag::all()->pluck('name')->take(1);
         $tag=$request->getQueryParams()['tag'];
         $path = "https://api.codechef.com/tags/problems?filter=$tag&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
         $res = make_api_request($_SESSION['access_token'],$path);
@@ -135,20 +106,17 @@ return function (App $app) {
             foreach ($data['tags'] as $tag) 
                 $tagsId[] = Tag::updateOrCreate(['name' => $tag], ['name' => $tag])->id;
 
-            
-            
             $problem->tags()->sync($tagsId);
         }
-           
-
+        
         return $response;
 
     });
 
     $app->get('/tags/search',function(Request $request,Response $response,array $args){
+
         $term = $request->getQueryParams()['term'];
         $list = Tag::where('name','like','%' . $term . '%')->get()->pluck('name')->take(10);
-        
         return $response->withJson($list);
 
     });
@@ -189,7 +157,31 @@ return function (App $app) {
     
 
     $app->get('/', function (Request $request, Response $response, array $args) use ($container) {
-        
+
+        $oauth_details = array('authorization_code' => '',
+        'access_token' => '',
+        'refresh_token' => ''
+        );
+    
+        $config = array('client_id'=> '21c0c6bf43fe831fa88386abf22155b5',
+            'client_secret' => '9a41e4fdf2b23c854783062891b38734',
+            'api_endpoint'=> 'https://api.codechef.com/',
+            'authorization_code_endpoint'=> 'https://api.codechef.com/oauth/authorize',
+            'access_token_endpoint'=> 'https://api.codechef.com/oauth/token',
+            'redirect_uri'=> 'https://programming-pratice-app.herokuapp.com',
+            'website_base_url' => 'https://programming-pratice-app.herokuapp.com'
+        );
+    
+    
+        if(isset($_GET['code'])){
+        $oauth_details['authorization_code'] = $_GET['code'];
+            $oauth = generate_access_token_first_time($config,$oauth_details);  
+            $_SESSION['access_token'] = $oauth['access_token'];
+            $_SESSION['refresh_token']=$oauth['refresh_token'];     
+        } else{
+            take_user_to_codechef_permissions_page($config);
+        }
+
         // Render index view
         return $container->get('renderer')->render($response, 'index.phtml', $args);
     });
