@@ -20,7 +20,8 @@
         "robmorgan/phinx": "dev-master#4c26aeb",
         "vlucas/phpdotenv": "^2.4",
         "respect/validation": "^1.1",
-        "league/fractal": "^0.17.0"
+        "league/fractal": "^0.17.0",
+        "ext-mysqli": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.4"

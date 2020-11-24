@@ -35,17 +35,17 @@ return [
 
         // Database settings
         'database'               => [
-            'driver'    => getenv('DB_CONNECTION'),
-            'host'      => getenv('DB_HOST'),
-            'database'  => getenv('DB_DATABASE'),
-            'username'  => getenv('DB_USERNAME'),
-            'password'  => getenv('DB_PASSWORD'),
+            'driver'    => 'mysqli',
+            'host'      => $cleardb_url["host"],
+            'database'  => substr(parse_url(getenv("CLEARDB_DATABASE_URL"))["path"],1),
+            'username'  => $cleardb_url["user"],
+            'password'  => $cleardb_url["pass"],
             'port'      => getenv('DB_PORT'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
         ],
-        //
+        
         'cors' => null !== getenv('CORS_ALLOWED_ORIGINS') ? getenv('CORS_ALLOWED_ORIGINS') : '*',
     ],
 ];
