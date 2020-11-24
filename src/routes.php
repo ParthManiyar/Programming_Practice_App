@@ -123,8 +123,9 @@ return function (App $app) {
 
     $app->get('/problem/search',function(Request $request,Response $response,array $args){
         $tagName = $request->getQueryParams()['term'];
-        $problems = Problem::select('problemcode','author','submission')->whereHas('tags', function($query) use ($tagName) {
-            $query->whereName($tagName);
+        $tagName = explode (",", $tagName);
+        $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
+            $query->whereIn($tagName);
           })->get();
 
         if(count($problems)==0){
@@ -146,12 +147,13 @@ return function (App $app) {
             }
 
             $tagName = $request->getQueryParams()['term'];
-            $problems = Problem::select('problemcode','author','submission')->whereHas('tags', function($query) use ($tagName) {
-                $query->whereName($tagName);
+            $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
+                $query->whereIn($tagName);
             })->get();
         }
         if(count($problems)==0){
             $result['status_code']=404;
+            $result['problems']="No problems found associate with these tags";
         }
         else{
             $result['status_code']=200;
@@ -184,7 +186,8 @@ return function (App $app) {
             $oauth = generate_access_token_first_time($config,$oauth_details);  
             $_SESSION['access_token'] = $oauth['access_token'];
             $_SESSION['refresh_token']=$oauth['refresh_token'];     
-        } else{
+        } 
+        else{
             take_user_to_codechef_permissions_page($config);
         }
 

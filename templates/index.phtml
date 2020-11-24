@@ -80,6 +80,7 @@ input[type=submit] {
     $("#search_problem").click(function(){
         $.get( "/problem/search",{term: $("#search_tag").val() }, function( data ) {
           if ( data['status_code'] == 404 ) {
+            $("#table tr").remove();
             $('#result').replaceWith('<span id = "result">'+ "Please enter the valid tag" + '</span>');
           }
           else{
