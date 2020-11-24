@@ -3,6 +3,12 @@
 defined('DS') ?: define('DS', DIRECTORY_SEPARATOR);
 defined('ROOT') ?: define('ROOT', dirname(__DIR__) . DS);
 
+$cleardb_url      = parse_url(getenv("CLEARDB_DATABASE_URL"));
+$cleardb_server   = $cleardb_url["host"];
+$cleardb_username = $cleardb_url["user"];
+$cleardb_password = $cleardb_url["pass"];
+$cleardb_db       = substr($cleardb_url["path"],1);
+
 // Load .env file
 if (file_exists(ROOT . '.env')) {
     $dotenv = new Dotenv\Dotenv(ROOT);
@@ -33,13 +39,15 @@ return [
             'level' => \Monolog\Logger::DEBUG,
         ],
 
+        
+
         // Database settings
         'database'               => [
             'driver'    => 'mysqli',
-            'host'      => $cleardb_url["host"],
-            'database'  => substr(parse_url(getenv("CLEARDB_DATABASE_URL"))["path"],1),
-            'username'  => $cleardb_url["user"],
-            'password'  => $cleardb_url["pass"],
+            'host'      => $cleardb_server,
+            'database'  => $cleardb_db,
+            'username'  => $cleardb_username,
+            'password'  => $cleardb_password,
             'port'      => getenv('DB_PORT'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
