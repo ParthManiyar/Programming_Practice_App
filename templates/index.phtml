@@ -79,12 +79,12 @@ input[type=submit] {
  
     $("#search_problem").click(function(){
         $.get( "/problem/search",{term: $("#search_tag").val() }, function( data ) {
-          if ( data.length == 0 ) {
+          if ( data['status_code'] == 404 ) {
             $('#result').replaceWith('<span id = "result">'+ "Please enter the valid tag" + '</span>');
           }
           else{
             $("#table tr").remove();
-            list = data;
+            list = data['problems'];
             $('#result').replaceWith('<span id = "result"> </span>');
             constructTable("#table");
           }

@@ -150,8 +150,14 @@ return function (App $app) {
                 $query->whereName($tagName);
             })->get();
         }
-        
-        return $response->withJson($problems);
+        if(count($problems)==0){
+            $result['status_code']=404;
+        }
+        else{
+            $result['status_code']=200;
+            $result['problems']=$problems;
+        }
+        return $response->withJson($result);
 
     });
     
