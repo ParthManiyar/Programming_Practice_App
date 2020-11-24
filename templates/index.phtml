@@ -85,6 +85,7 @@ input[type=submit] {
           else{
             $("#table tr").remove();
             list = data;
+            $('#result').replaceWith('<span id = "result"> </span>');
             constructTable("#table");
           }
             function constructTable(selector) { 
