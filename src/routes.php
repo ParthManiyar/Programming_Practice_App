@@ -128,7 +128,7 @@ return function (App $app) {
             $query->whereName($tagName);
           })->get();
 
-        $tagList =  Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
+        $tagList =  Problem::whereHas('tags', function($query) use ($tagName) {
             $query->whereName($tagName);
           })->tags; 
 
