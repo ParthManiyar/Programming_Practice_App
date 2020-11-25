@@ -127,10 +127,9 @@ return function (App $app) {
         $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
             $query->whereName($tagName);
           })->get();
-        $tagList=array();
-        foreach($problems as $p){
-            array_push($tagList,Problem::where('problemcode',$p['Problem Code'])->first()->id);
-        } 
+
+        foreach($problems as $p)
+            $p['tags'] = Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags;
 
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
@@ -159,12 +158,13 @@ return function (App $app) {
         if(count($problems)==0){
             $result['status_code']=404;
             $result['problems']="No problems found associate with this tags";
+            
         }
         else{
             $result['status_code']=200;
             $result['problems']=$problems;
         }
-        return $response->withJson($tagList);
+        return $response->withJson($result);
 
     });
     
