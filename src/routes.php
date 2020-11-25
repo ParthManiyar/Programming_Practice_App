@@ -129,7 +129,7 @@ return function (App $app) {
           })->get();
 
         foreach($problems as $p)
-            $p['tags'] = Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags['name'];
+            $p['tags'] = Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags->name;
 
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
