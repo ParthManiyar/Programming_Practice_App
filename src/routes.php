@@ -129,7 +129,7 @@ return function (App $app) {
           })->get();
         $tagList=array();
         foreach($problems as $p){
-            array_push($tagList,Problem::where('problemcode',p['Problem Code'])->first()->id);
+            array_push($tagList,Problem::where('problemcode',$p['Problem Code'])->first()->id);
         } 
 
         if(count($problems)==0){
