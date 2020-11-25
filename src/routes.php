@@ -123,7 +123,7 @@ return function (App $app) {
 
     $app->get('/problem/search',function(Request $request,Response $response,array $args){
         $tagName = $request->getQueryParams()['term'];
-        $tagName = explode (",", $tagName);
+        $tagName = explode('%2C',$tagName);
         
         $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
             $query->whereIn('name' , $tagName);
