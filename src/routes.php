@@ -73,7 +73,7 @@ function make_api_request($oauth_config, $path){
 
 return function (App $app) {
     $container = $app->getContainer();
-
+    /*
     $app->get('/tags/create',function(Request $request,Response $response,array $args){
         $path = "https://api.codechef.com/tags/problems?filter=&fields=&limit=100&offset=0";
         $res = make_api_request($_SESSION['access_token'],$path);
@@ -112,7 +112,7 @@ return function (App $app) {
         return $response;
 
     });
-
+    */
     $app->get('/tags/search',function(Request $request,Response $response,array $args){
 
         $term = $request->getQueryParams()['term'];
@@ -132,11 +132,10 @@ return function (App $app) {
             $t = Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags()->select('name')->get();
             $p['tags']="";
             foreach($t as $a){
-              $p['tags'] .= $a['name'] . ",";
+              $p['tags'] .= $a['name'] . ", ";
             }
-            substr_replace($p['tags'] ,"",-1);
         }
-
+        /*
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
             $res = make_api_request($_SESSION['access_token'],$path);
@@ -159,8 +158,9 @@ return function (App $app) {
             $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
                 $query->whereName($tagName);
             })->get();
-              
+            
         }
+        */
         if(count($problems)==0){
             $result['status_code']=404;
             $result['problems']="No problems found associate with this tags";
@@ -176,7 +176,7 @@ return function (App $app) {
     
 
     $app->get('/', function (Request $request, Response $response, array $args) use ($container) {
-
+        /*
         $oauth_details = array('authorization_code' => '',
         'access_token' => '',
         'refresh_token' => ''
@@ -201,7 +201,7 @@ return function (App $app) {
         else{
             take_user_to_codechef_permissions_page($config);
         }
-
+        */
         // Render index view
         return $container->get('renderer')->render($response, 'index.phtml', $args);
     });
