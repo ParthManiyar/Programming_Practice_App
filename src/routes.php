@@ -127,7 +127,7 @@ return function (App $app) {
         $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
             $query->whereName($tagName);
           })->get();
-
+        $tagList=array();
         foreach($problems as $p){
             array_push($tagList,Problem::find(Problem::where('problemcode',p['Problem Code'])->first()->id)->tags);
         } 
