@@ -134,7 +134,7 @@ return function (App $app) {
             foreach($t as $a){
               $p['tags'] .= $a['name'] . ",";
             }
-            $p['tags'][strlen($p['tags'])-2]="";
+            substr_replace($p['tags'] ,"",-1);
         }
 
         if(count($problems)==0){
