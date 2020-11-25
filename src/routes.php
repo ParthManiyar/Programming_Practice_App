@@ -128,8 +128,12 @@ return function (App $app) {
             $query->whereName($tagName);
           })->get();
 
-        foreach($problems as $p)
-            $p['tags'] = implode(",",Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags()->select('name')->get());
+        foreach($problems as $p){
+            $t = Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags()->select('name')->get();
+            foreach($t as $a){
+                $p['tags'] .= $a['name'] . ",";
+            }
+        }
 
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
