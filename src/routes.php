@@ -132,8 +132,9 @@ return function (App $app) {
             $t = Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags()->select('name')->get();
             $p['tags']="";
             foreach($t as $a){
-              $p['tags'] .= $a['name'];
+              $p['tags'] .= $a['name'] . ",";
             }
+            $p['tags'][strlen($p['tags'])-1]="";
         }
 
         if(count($problems)==0){
