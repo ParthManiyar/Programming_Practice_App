@@ -128,9 +128,9 @@ return function (App $app) {
             $query->whereName($tagName);
           })->get();
 
-        $tagList =  Problem::whereHas('tags', function($query) use ($tagName) {
-            $query->whereName($tagName);
-          })->tags; 
+        foreach($problems as $p){
+            array_push($tagList,Problem::find(Problem::where('problemcode',p['Problem Code'])->first()->id)->tags);
+        } 
 
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
