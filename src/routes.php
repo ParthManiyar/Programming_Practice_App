@@ -123,11 +123,10 @@ return function (App $app) {
 
     $app->get('/problem/search',function(Request $request,Response $response,array $args){
         $tagName = $request->getQueryParams()['term'];
-        $tagName = explode('%2C',$tagName);
         
-        $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
-            $query->whereIn('name' , $tagName);
-          }, '=', count($tagName))->get();
+        $problems = Problem::select('problemcode as Problem Code','author','submission','tags')->whereHas('tags', function($query) use ($tagName) {
+            $query->whereName($tagName);
+          })->get();
 
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
@@ -148,13 +147,13 @@ return function (App $app) {
             }
 
             $tagName = $request->getQueryParams()['term'];
-            $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
-                $query->whereIn('name' , $tagName);
-            },'=', count($tagName))->get();
+            $problems = Problem::select('problemcode as Problem Code','author','submission','tags')->whereHas('tags', function($query) use ($tagName) {
+                $query->whereName($tagName);
+            })->get();
         }
         if(count($problems)==0){
             $result['status_code']=404;
-            $result['problems']="No problems found associate with these tags";
+            $result['problems']="No problems found associate with this tags";
         }
         else{
             $result['status_code']=200;
