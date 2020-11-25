@@ -124,9 +124,13 @@ return function (App $app) {
     $app->get('/problem/search',function(Request $request,Response $response,array $args){
         $tagName = $request->getQueryParams()['term'];
         
-        $problems = Problem::select('problemcode as Problem Code','author','submission','tags')->whereHas('tags', function($query) use ($tagName) {
+        $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
             $query->whereName($tagName);
           })->get();
+
+        $tagList =  Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
+            $query->whereName($tagName);
+          })->tags; 
 
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
@@ -147,9 +151,10 @@ return function (App $app) {
             }
 
             $tagName = $request->getQueryParams()['term'];
-            $problems = Problem::select('problemcode as Problem Code','author','submission','tags')->whereHas('tags', function($query) use ($tagName) {
+            $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
                 $query->whereName($tagName);
             })->get();
+              
         }
         if(count($problems)==0){
             $result['status_code']=404;
@@ -159,7 +164,7 @@ return function (App $app) {
             $result['status_code']=200;
             $result['problems']=$problems;
         }
-        return $response->withJson($result);
+        return $response->withJson($tagList);
 
     });
     
