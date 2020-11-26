@@ -121,6 +121,16 @@ return function (App $app) {
 
     });
 
+    $app->get('/tags/delete',function(Request $request,Response $response,array $args){
+        $list  = Tag::where('id' ,'>' ,0)->pluck('id')->all();
+        foreach($list as $l){
+          $pro = Tag::find($l)->problems;
+          if(count($pro)==0)
+            Tag::where('id',$l)->delete();  
+        }
+        return $response->withJson($list);
+    });
+
     $app->get('/problem/search',function(Request $request,Response $response,array $args){
         $tagName = $request->getQueryParams()['term'];
         
