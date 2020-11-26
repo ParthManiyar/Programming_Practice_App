@@ -114,14 +114,14 @@ return function (App $app) {
     });
     */
     $app->get('/tags/search',function(Request $request,Response $response,array $args){
-
+        
         $term = $request->getQueryParams()['term'];
         $list = Tag::where('name','like','%' . $term . '%')->get()->pluck('name')->take(10);
         return $response->withJson($list);
 
     });
 
-    $app->get('/tags/delete',function(Request $request,Response $response,array $args){
+    /*$app->get('/tags/delete',function(Request $request,Response $response,array $args){
         $list  = Tag::where('id' ,'>' ,0)->pluck('id')->all();
         foreach($list as $l){
           $pro = Tag::find($l)->problems;
@@ -129,22 +129,24 @@ return function (App $app) {
             Tag::where('id',$l)->delete();  
         }
         return $response->withJson($list);
-    });
+    });*/
 
     $app->get('/problem/search',function(Request $request,Response $response,array $args){
-        $tagName = $request->getQueryParams()['term'];
-        
-        $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
-            $query->whereName($tagName);
-          })->get();
+        try{
+            $tagName = $request->getQueryParams()['term'];
+            
+            $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
+                $query->whereName($tagName);
+            })->get();
 
-        foreach($problems as $p){
-            $t = Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags()->select('name')->get();
-            $p['tags']="";
-            foreach($t as $a){
-              $p['tags'] .= $a['name'] . ", ";
+            foreach($problems as $p){
+                $t = Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags()->select('name')->get();
+                $p['tags']="";
+                foreach($t as $a){
+                $p['tags'] .= $a['name'] . ", ";
+                }
             }
-        }
+            $p['tags'] = rtrim($p['tags'], ", ");
         /*
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
@@ -169,24 +171,26 @@ return function (App $app) {
                 $query->whereName($tagName);
             })->get();
             
+        }*/
+        
+            if(count($problems)==0){
+                $result['status_code']=404;
+                $result['problems']="No problems found associate with this tags";
+                
+            }
+            else{
+                $result['status_code']=200;
+                $result['problems']=$problems;
+            }
         }
-        */
-        if(count($problems)==0){
-            $result['status_code']=404;
-            $result['problems']="No problems found associate with this tags";
-            
-        }
-        else{
-            $result['status_code']=200;
-            $result['problems']=$problems;
+        catch(Exception $e) {
+            $result['status_code']=500;
+            $result['problems']="Interval Server Error has occured";
         }
         return $response->withJson($result);
 
     });
-    
-
-    $app->get('/', function (Request $request, Response $response, array $args) use ($container) {
-        /*
+    $app->get('/login', function (Request $request, Response $response, array $args){
         $oauth_details = array('authorization_code' => '',
         'access_token' => '',
         'refresh_token' => ''
@@ -197,8 +201,8 @@ return function (App $app) {
             'api_endpoint'=> 'https://api.codechef.com/',
             'authorization_code_endpoint'=> 'https://api.codechef.com/oauth/authorize',
             'access_token_endpoint'=> 'https://api.codechef.com/oauth/token',
-            'redirect_uri'=> 'https://programming-pratice-app.herokuapp.com',
-            'website_base_url' => 'https://programming-pratice-app.herokuapp.com'
+            'redirect_uri'=> 'https://programming-pratice-app.herokuapp.com/login',
+            'website_base_url' => 'https://programming-pratice-app.herokuapp.com/login'
         );
     
     
@@ -206,12 +210,18 @@ return function (App $app) {
         $oauth_details['authorization_code'] = $_GET['code'];
             $oauth = generate_access_token_first_time($config,$oauth_details);  
             $_SESSION['access_token'] = $oauth['access_token'];
-            $_SESSION['refresh_token']=$oauth['refresh_token'];     
+            $_SESSION['refresh_token']=$oauth['refresh_token'];
+            header('Location: https://programming-pratice-app.herokuapp.com');
+            die();
         } 
         else{
             take_user_to_codechef_permissions_page($config);
         }
-        */
+
+    });
+
+    $app->get('/', function (Request $request, Response $response, array $args) use ($container) {
+        
         // Render index view
         return $container->get('renderer')->render($response, 'index.phtml', $args);
     });
