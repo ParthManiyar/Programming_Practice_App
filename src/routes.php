@@ -115,7 +115,7 @@ return function (App $app) {
     */
     $app->get('/tags/search',function(Request $request,Response $response,array $args){
         
-        $term = $request->getQueryParams()['term'];
+        $term = $request->getQueryParams()['query'];
         $list = Tag::where('name','like','%' . $term . '%')->get()->pluck('name')->take(10);
         return $response->withJson($list);
 
@@ -131,22 +131,23 @@ return function (App $app) {
         return $response->withJson($list);
     });*/
 
-    $app->get('/problem/search',function(Request $request,Response $response,array $args){
+    $app->post('/problem/search',function(Request $request,Response $response,array $args){
         try{
-            $tagName = $request->getQueryParams()['term'];
+            $tagName = $request->getParsedBody()['term'];
+            $tagName =  array_map( 'trim', explode( ",",$tagName ) );
             
             $problems = Problem::select('problemcode as Problem Code','author','submission')->whereHas('tags', function($query) use ($tagName) {
-                $query->whereName($tagName);
-            })->get();
-
+                $query->whereIn('name',$tagName);
+            },'=',count($tagName))->get();
             foreach($problems as $p){
                 $t = Problem::find(Problem::where('problemcode',$p['Problem Code'])->first()->id)->tags()->select('name')->get();
                 $p['tags']="";
                 foreach($t as $a){
-                $p['tags'] .= $a['name'] . ", ";
+                    $p['tags'] .= $a['name'] . ", ";
                 }
+                $p['tags'] = rtrim($p['tags'], ", ");
             }
-            $p['tags'] = rtrim($p['tags'], ", ");
+            
         /*
         if(count($problems)==0){
             $path = "https://api.codechef.com/tags/problems?filter=$tagName&fields=code, tags, author, solved, attempted, partiallySolved&limit=100&offset=0";
@@ -175,7 +176,7 @@ return function (App $app) {
         
             if(count($problems)==0){
                 $result['status_code']=404;
-                $result['problems']="No problems found associate with this tags";
+                $result['problems']="Please enter a valid tag";
                 
             }
             else{
@@ -185,7 +186,7 @@ return function (App $app) {
         }
         catch(Exception $e) {
             $result['status_code']=500;
-            $result['problems']="Interval Server Error has occured";
+            $result['problems']="Interal Server error has occured";
         }
         return $response->withJson($result);
 

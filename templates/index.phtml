@@ -1,164 +1,145 @@
 <!doctype html>
+
 <html lang="en">
-<head>
-<!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
- 
-<!-- jQuery UI -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
- 
-<!-- Bootstrap CSS -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tokenfield/0.12.0/css/bootstrap-tokenfield.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tokenfield/0.12.0/bootstrap-tokenfield.js"></script>
+  </head>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-* {
-  box-sizing: border-box;
-}
+  <body>
+    <br />
+    <br />
+    <div class="container">
+      <h1 align="center">Problem Search with Multiple Tag </h1>
+      <br />
+      <br />
+      <br />
+      <div class="row">
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-8">
+          <div class="form-group">
+            <label>Enter Multiple Tags:</label>
+            <div class="input-group">
+              <input type="text" id="search_data" placeholder="" autocomplete="off" class="form-control input-lg" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-primary btn-lg" id="search_problem">Search</button>
+              </div>
+            </div>
+            <br/>
+            <div style="text-align: center;">
+              <strong> 
+                <span id = "result">
+                </span> 
+              </strong>
+            </div>
 
-body {
-  font: 16px Arial;  
-}
+            <br/>
 
-/*the container must be positioned relative:*/
-.autocomplete {
-  
-  position: relative;
-  display: inline-block;
-}
-
-input {
-  border: 1px solid transparent;
-  background-color: #f1f1f1;
-  padding: 10px;
-  font-size: 16px;
-}
-
-input[type=text] {
-  background-color: #f1f1f1;
-  width: 100%;
-}
-
-input[type=submit] {
-  background-color: DodgerBlue;
-  color: #fff;
-  cursor: pointer;
-}
-
-
-</style>
-
-</head>
-
-<body>
+            <table align = "center" id="table" border="1"> </table>
+          </div> 
+        </div>
+        <div class="col-md-2">
+        </div>
+      </div>  
+    </div>
 
 
-<p>Tag Search:</p>
-
-<!--Make sure the form has the autocomplete function switched off:-->
-  <div class="autocomplete" style="width:300px;"  >
-    <input id = "search_tag" type="text" >
-  </div>
-  <input type="submit" id = "search_problem">
-  <br>
-  <br>
-  <div style="text-align: center;">
-    <strong> 
-        <span id = "result">
-
-        </span> 
-    </strong>
-   </div>
-   <br>
-  <table align = "center" id="table" border="1"> 
-    </table> 
-    
-
-
-
-<script type="text/javascript">
-
-    $( "#search_tag" ).autocomplete({source: '/tags/search'});
- 
-    $("#search_problem").click(function(){
-        $.get( "/problem/search",{term: $("#search_tag").val() }, function( data ) {
-          if(data['status_code'] == 500){
-            $("#table tr").remove();
-            $('#result').replaceWith('<span id = "result">'+ data['problems'] + '</span>');
-          }
-          else if ( data['status_code'] == 404 ) {
-            $("#table tr").remove();
-            $('#result').replaceWith('<span id = "result">'+ "Please enter a valid tag" + '</span>');
-          }
+    <script type="text/javascript">
+        $(document).ready(function(){
+          $('#search_data').tokenfield({
+                  autocomplete :{
+                      source: function(request, response)
+                      {
+                          jQuery.get('/tags/search', {
+                              query : request.term
+                          }, function(data){
+                              response(data);
+                          });
+                      },
+                      delay: 100
+                  }
+              });
+      
+          $("#search_problem").click(function(){
+              $.post( "/problem/search",{term: $('#search_data').val() }, function( data ) {
+                if(data['status_code'] == 500){
+                  $("#table tr").remove();
+                  $('#result').replaceWith('<span id = "result">'+ data['problems'] + '</span>');
+                }
+                else if ( data['status_code'] == 404 ) {
+                  $("#table tr").remove();
+                  $('#result').replaceWith('<span id = "result">'+ data['problems'] + '</span>');
+                }
+                
+                else{
+                  $("#table tr").remove();
+                  list = data['problems'];
+                  $('#result').replaceWith('<span id = "result"> Problem Count: ' + list.length +' </span>');
+                  constructTable("#table");
+                }
+                  function constructTable(selector) { 
+                    
+                    // Getting the all column names 
+                    var cols = Headers(list, selector);   
           
-          else{
-            $("#table tr").remove();
-            list = data['problems'];
-            $('#result').replaceWith('<span id = "result"> Problem Count: ' + list.length +' </span>');
-            constructTable("#table");
-          }
-            function constructTable(selector) { 
-              
-              // Getting the all column names 
-              var cols = Headers(list, selector);   
-     
-              // Traversing the JSON data 
-              for (var i = 0; i < list.length; i++) { 
-                  var row = $('<tr/>');    
-                  for (var colIndex = 0; colIndex < cols.length; colIndex++) 
-                  { 
-                      var val = list[i][cols[colIndex]];
-                      var str1 =  cols[colIndex];
-                      var str2  = "Problem Code"
-                        if(str1.localeCompare(str2)==0){
-                            var dm = "<a href = https://www.codechef.com/problems/" + val + " target='_blank' > " + val + " </a>" 
-                        // If there is any key, which is matching 
-                        // with the column name 
-                        if (val == null) val = "";   
-                            row.append($('<td/>').html(dm)); 
-                        }
-                        else{
-                            if (val == null) val = "";   
-                            row.append($('<td/>').html(val));
-                        }
-                      
-                  } 
-                    
-                  // Adding each row to the table 
-                  $(selector).append(row); 
-              } 
-          } 
-            
-          function Headers(list, selector) { 
-              var columns = []; 
-              var header = $('<tr/>'); 
-                
-              for (var i = 0; i < list.length; i++) { 
-                  var row = list[i]; 
-                    
-                  for (var k in row) { 
-                      if ($.inArray(k, columns) == -1) { 
-                          columns.push(k); 
+                    // Traversing the JSON data 
+                    for (var i = 0; i < list.length; i++) { 
+                        var row = $('<tr/>');    
+                        for (var colIndex = 0; colIndex < cols.length; colIndex++) 
+                        { 
+                            var val = list[i][cols[colIndex]];
+                            var str1 =  cols[colIndex];
+                            var str2  = "Problem Code"
+                              if(str1.localeCompare(str2)==0){
+                                  var dm = "<a href = https://www.codechef.com/problems/" + val + " target='_blank' > " + val + " </a>" 
+                              // If there is any key, which is matching 
+                              // with the column name 
+                              if (val == null) val = "";   
+                                  row.append($('<td/>').html(dm)); 
+                              }
+                              else{
+                                  if (val == null) val = "";   
+                                  row.append($('<td/>').html(val));
+                              }
                             
-                          // Creating the header 
-                          header.append($('<th/>').html(k)); 
-                      } 
-                  } 
-              } 
-                
-              // Appending the header to the table 
-              $(selector).append(header); 
-                  return columns; 
-          }
-        
+                        } 
+                          
+                        // Adding each row to the table 
+                        $(selector).append(row); 
+                    } 
+                } 
+                  
+                function Headers(list, selector) { 
+                    var columns = []; 
+                    var header = $('<tr/>'); 
+                      
+                    for (var i = 0; i < list.length; i++) { 
+                        var row = list[i]; 
+                          
+                        for (var k in row) { 
+                            if ($.inArray(k, columns) == -1) { 
+                                columns.push(k); 
+                                  
+                                // Creating the header 
+                                header.append($('<th/>').html(k)); 
+                            } 
+                        } 
+                    } 
+                      
+                    // Appending the header to the table 
+                    $(selector).append(header); 
+                        return columns; 
+                }
+              
+              });
+          });
         });
-    });
-
-    
-         
-
-</script>
-
-</body>
+    </script>
+  </body>
 </html>
