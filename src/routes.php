@@ -176,7 +176,7 @@ return function (App $app) {
         
             if(count($problems)==0){
                 $result['status_code']=404;
-                $result['problems']="Please enter a valid tag";
+                $result['problems']="No Problems associate with these tags";
                 
             }
             else{
