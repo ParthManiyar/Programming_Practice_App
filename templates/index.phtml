@@ -66,7 +66,7 @@ input[type=submit] {
   <table align = "center" id="table" border="1"> 
     </table> 
     <strong> 
-      <span id = "result">
+      <span align = "center" id = "result">
 
       </span> 
     </strong>
@@ -91,7 +91,7 @@ input[type=submit] {
           else{
             $("#table tr").remove();
             list = data['problems'];
-            $('#result').replaceWith('<span id = "result"> </span>');
+            $('#result').replaceWith('<span id = "result"> Problem Count: ' + list.length +' </span>');
             constructTable("#table");
           }
             function constructTable(selector) { 
